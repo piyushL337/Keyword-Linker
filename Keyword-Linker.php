@@ -20,7 +20,10 @@ function keyword_linker_save_post($post_id) {
 add_action('save_post', 'keyword_linker_save_post');
 
 function keyword_linker_content($content) {
+  global $post;
+
   // Get the keywords and links for the post
+  $post_id = $post->ID;
   $keywords = get_post_meta($post_id, 'keyword');
   $links = get_post_meta($post_id, 'keyword_link');
 
