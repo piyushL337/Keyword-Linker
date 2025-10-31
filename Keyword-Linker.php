@@ -365,9 +365,8 @@ function keyword_linker_content($content) {
     }
     
     // Sort keywords by length (longest first) to match longer phrases before shorter ones
-    uksort($keywords_data, function($a, $b) {
-        return strlen($b) - strlen($a);
-    });
+    $keyword_lengths = array_map('strlen', array_keys($keywords_data));
+    array_multisort($keyword_lengths, SORT_DESC, $keywords_data);
     
     // Track replacements
     $keyword_count = array();
@@ -431,15 +430,8 @@ function keyword_linker_content($content) {
         
         // Build regex pattern
         $pattern_keyword = preg_quote($keyword, '/');
-        $case_flag = $options['case_sensitive'] ? '' : 'i';
-        $pattern = '/\b(' . $pattern_keyword . ')\b/u' . $case_flag;
-        
-        // Count potential matches
-        $matches_found = preg_match_all($pattern, $content, $matches);
-        
-        if ($matches_found === false || $matches_found === 0) {
-            continue;
-        }
+        $flags = 'u' . ($options['case_sensitive'] ? '' : 'i');
+        $pattern = '/\b(' . $pattern_keyword . ')\b/' . $flags;
         
         // Calculate how many we can replace
         $remaining_for_keyword = $options['max_links_per_keyword'] - $keyword_count[$keyword];
